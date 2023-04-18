@@ -62,7 +62,7 @@ namespace APICourse.Controllers
 
         // PUT api/<CoursesController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Course value)
+        public IActionResult Put(int id, [FromBody] Course value)
         {
             var curso = _context.Courses.AsNoTracking().FirstOrDefault(x => x.Id == id);
             if (curso == null) return NotFound("Curso não encontrado para atualizar");

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace APICourse.Models
@@ -11,8 +12,10 @@ namespace APICourse.Models
     [Table("tbCourse")]
     public class Course
     {
-        [Key]   
+        [Key]
         //[DefaultValue(0)]
+        [JsonPropertyName("_id")]
+        [Column("_id")]
         public int Id { get; set; }
 
         public string Name { get; set; }
