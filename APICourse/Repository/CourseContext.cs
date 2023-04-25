@@ -23,6 +23,7 @@ namespace APICourse.Repository
                 .HasKey(c => c.Id)
                 .HasName("PK_Id_tbCourse");
 
+
             modelBuilder.Entity<Course>()
                 .HasData(new List<Course>() {
                     new Course(){ Id = 1, Name = "Java", Category = UtilConstants.backend },
@@ -32,6 +33,29 @@ namespace APICourse.Repository
                 });
 
 
+        }
+
+        public override int SaveChanges()
+        {
+            /*O soft delete não exclui os dados completamente do banco de dados, 
+             ele altera o estado do registro. No caso da entidade "Course",
+             altera para inativo.
+             */
+            //Início do "Soft Delete"
+            var entities = ChangeTracker.Entries()
+                        .Where(e => e.State == EntityState.Deleted);
+            foreach (var entity in entities)
+            {
+                if (entity.Entity is Course)
+                {
+                    entity.State = EntityState.Modified;
+                    var course = entity.Entity as Course;
+                    course.Status = UtilConstants.Inativo;
+                }
+            }
+            //Fim do "Soft Delete"
+
+            return base.SaveChanges();
         }
 
     }

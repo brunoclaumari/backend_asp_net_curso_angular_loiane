@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APICourse.Constants;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -13,23 +14,31 @@ namespace APICourse.Models
     public class Course
     {
         [Key]
-        //[DefaultValue(0)]
+        //[DefaultValue(0)]        
         [JsonPropertyName("_id")]
         [Column("_id")]
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Campo \"nome\" é obrigatório!")]
+        [StringLength(100, MinimumLength = 5, ErrorMessage = "O campo nome deve ter entre 5 e 100 caracteres!")]
         public string Name { get; set; }
 
+        [Required(ErrorMessage = "Campo \"categoria\" é obrigatório!")]
+        [StringLength(10, MinimumLength = 5)]
+        [RegularExpression("back-end|front-end")]
         public string Category { get; set; }
+
+        [DefaultValue("Ativo")]
+        [Required(ErrorMessage = "Campo \"status\" é obrigatório!")]
+        [StringLength(10, MinimumLength = 5)]
+        [RegularExpression("Ativo|Inativo")]
+        public string Status { get; set; } = UtilConstants.Ativo;
 
         public Course()
         {
+            //Status = UtilConstants.Ativo;
         }
 
-        public Course(string name, string category)
-        {
-            Name = name;
-            Category = category;
-        }
+
     }
 }

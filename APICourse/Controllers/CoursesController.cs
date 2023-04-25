@@ -1,8 +1,10 @@
-﻿using APICourse.Models;
+﻿using APICourse.Constants;
+using APICourse.Models;
 using APICourse.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -24,18 +26,15 @@ namespace APICourse.Controllers
         // GET: api/<CoursesController>
         [HttpGet]
         public ActionResult<List<Course>> Get()
-        {
-            //List<Course> listaCourses = new List<Course>();
-            //var listaCoursess = _context.Courses;            
-
-            return Ok(_context.Courses);
+        {            
+            return Ok(_context.Courses.Where(x => x.Status == UtilConstants.Ativo));
         }
 
         // GET api/<CoursesController>/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get([Required] int id)
         {
-            var course = _context.Courses.FirstOrDefault(x => x.Id == id);
+            var course = _context.Courses.FirstOrDefault(x => x.Id == id && x.Status == UtilConstants.Ativo);
             if (course != null)
                 return Ok(course);
             else

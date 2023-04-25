@@ -3,6 +3,8 @@
 
 - Nesse exemplo estou usando o SQLite inicialmente para fazer os pequenos testes.
 
+get-help entityframeworkcore
+
 - Para adicionar uma Migration
 No Visual Studio (2019), ir em "View/Other Windows/Package Manager Console". 
 Digitar "get-help entityframeworkcore" > Vai mostrar alguns comandos do Entity.
