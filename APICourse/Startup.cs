@@ -1,4 +1,5 @@
 using APICourse.Repository;
+using APICourse.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GlobalExceptionHandler.WebApi;
+using APICourse.Exceptions;
+using System.Net;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using AutoMapper;
 
 namespace APICourse
 {
@@ -41,11 +48,18 @@ namespace APICourse
                     )
                 );
 
-            services.AddControllers();
+            services.AddScoped<CourseService>();
+            services.AddControllers(f => {
+                f.Filters.Add<MyExceptionFilter>();
+            });
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "APICourse", Version = "v1" });
             });
+
+            //services.addAu;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

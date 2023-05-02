@@ -1,6 +1,9 @@
 ﻿using APICourse.Constants;
+using APICourse.DTO;
+using APICourse.Exceptions;
 using APICourse.Models;
 using APICourse.Repository;
+using APICourse.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -14,62 +17,59 @@ namespace APICourse.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class CoursesController : ControllerBase
-    {
-        private readonly CourseContext _context;
+    {        
+        private readonly CourseService _service;
 
-        public CoursesController(CourseContext context)
-        {
-            _context = context;
+        public CoursesController(CourseService courseService)
+        {            
+            _service = courseService;
         }
 
 
         // GET: api/<CoursesController>
         [HttpGet]
-        public ActionResult<List<Course>> Get()
+        public ActionResult<List<CourseDTO>> GetAll()
         {            
-            return Ok(_context.Courses.Where(x => x.Status == UtilConstants.Ativo));
+            return Ok(_service.GetAll().Result);
         }
 
         // GET api/<CoursesController>/5
         [HttpGet("{id}")]
-        public IActionResult Get([Required] int id)
+        public IActionResult GetById([Required] int id)
         {
-            var course = _context.Courses.FirstOrDefault(x => x.Id == id && x.Status == UtilConstants.Ativo);
-            if (course != null)
-                return Ok(course);
+            CourseDTO courseDTO = _service.GetById(id).Result;           
+            if (courseDTO != null)
+                return Ok(courseDTO);
             else
             {
                 string msg = $"Curso solicitado não encontrado!! Id: {id}";
-                return NotFound(msg);
+                throw new MyEntityNotFoundException(msg);
             }
-            //return NotFound("{\"Status\":404, \"Erro\":\"Entidade não encontrada!!\"}");
-
-            //return "value";
         }
 
         // POST api/<CoursesController>
         [HttpPost]
-        public IActionResult Post([FromBody] Course value)
+        public IActionResult Create([FromBody] CourseDTO value)
         {            
-            _context.Add(value);
-            int numLinhas = _context.SaveChanges();
-            if (numLinhas > 0)
-                return Ok(value);
+            string msg = "Não foi possível adicionar o Curso!";
+            var courseDTO = _service.Create(value).Result;
+            if (courseDTO != null)
+                return CreatedAtAction(nameof(Create), courseDTO);
             else
-                return BadRequest("Não foi possível adicionar o Curso!");
+                throw new CreateFailException(msg);
         }
 
         // PUT api/<CoursesController>/5
+        //public IActionResult Update(int id, [FromBody] Course value)
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Course value)
+        public IActionResult Update(int id, [FromBody] CourseDTO value)
         {
-            var curso = _context.Courses.AsNoTracking().FirstOrDefault(x => x.Id == id);
-            if (curso == null) return NotFound("Curso não encontrado para atualizar");
-            value.Id = curso.Id;
-            _context.Update(value);
-            _context.SaveChanges();
-
-            return Ok(value);
+            var cursoAtualizado = _service.Update(id, value);
+            
+            if (cursoAtualizado.Result != null)
+                return Ok(cursoAtualizado.Result);
+            else
+                throw new MyEntityNotFoundException($"Curso com id = {id} não foi encontrado para atualizar");
         }
 
         // DELETE api/<CoursesController>/5
@@ -77,13 +77,12 @@ namespace APICourse.Controllers
         public IActionResult Delete(int id)
         {
             string msg = $"Curso com id {id} não encontrado para apagar";
-            var curso = _context.Courses.FirstOrDefault(x => x.Id == id);
-            if (curso == null) return NotFound(msg);
 
-            _context.Remove(curso);
-            _context.SaveChanges();
-
-            return NoContent();
+            int numLinhas = _service.Delete(id).Result;
+            if (numLinhas > 0)
+                return NoContent();
+            else
+                throw new MyEntityNotFoundException(msg);            
         }
     }
 }

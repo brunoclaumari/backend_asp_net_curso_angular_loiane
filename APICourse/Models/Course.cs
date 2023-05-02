@@ -34,6 +34,7 @@ namespace APICourse.Models
         [RegularExpression("Ativo|Inativo")]
         public string Status { get; set; } = UtilConstants.Ativo;
 
+        //Não esquecer de fazer o DTO, que não vai ter o status
         public Course()
         {
             //Status = UtilConstants.Ativo;
